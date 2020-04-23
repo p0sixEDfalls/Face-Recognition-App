@@ -1,5 +1,3 @@
-#THIS FILE IS NEEDED FOR CREATING DATASET
-
 import os
 import cv2
 import imutils
@@ -25,8 +23,11 @@ while(True):
         ROI_COLOR = frame[y:y+h, x:x+w]
         end_cord_x = x + w
         end_cord_y = y + h
+        #CAREFUL! 
+        # If prediction.predict(ROI_COLOR) throw exception and return None
+        # We will put CLASS_UNKNOW text
         class_name = prediction.predict(ROI_COLOR)
-        cv2.putText(frame, class_name, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, COLOR, STROKE, cv2.LINE_AA)
+        cv2.putText(frame, class_name or shared.CLASS_UNKNOW, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, COLOR, STROKE, cv2.LINE_AA)
         cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), COLOR, STROKE)
 
     cv2.imshow('frame', frame)

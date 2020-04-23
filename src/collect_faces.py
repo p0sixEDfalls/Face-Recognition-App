@@ -6,7 +6,6 @@ import shared
 FACE_CASCADE = cv2.CascadeClassifier(os.path.join("..", "data", "cascades", shared.DEFAULT))
 CAP = cv2.VideoCapture(0)
 COUNT = len(next(os.walk(shared.ROOT_TRAIN_NIKITA_FOLDER))[2])
-
 ROI_COLOR = []
 COLOR = (255, 0, 0)
 STROKE = 2

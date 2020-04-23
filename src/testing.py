@@ -1,17 +1,15 @@
-import os
-from keras.models import load_model
-from keras.preprocessing import image
-import shared
-import numpy as np
 import cv2
-
-FACE_CASCADE = cv2.CascadeClassifier(os.path.join("..", "data", "cascades", shared.DEFAULT))
+import os
+import numpy as np
+from keras.models import load_model
+import shared
 
 model = load_model(shared.MODEL_NAME)
-img = image.load_img('7.png', target_size=(shared.IMG_WIDTH, shared.IMG_HEIGHT))
-x = image.img_to_array(img)
-x = np.expand_dims(x, axis=0)
-
-images = np.vstack([x])
-classes = model.predict_classes(images)
-print(classes)
+img = cv2.imread(os.path.join(shared.ROOT_TEST_UNKNOW_FOLDER, '0.png'))
+img = cv2.resize(img, (shared.IMG_WIDTH, shared.IMG_HEIGHT))
+img = np.reshape(img, [1, shared.IMG_WIDTH, shared.IMG_HEIGHT, 3])
+classes = model.predict_classes(img)
+if classes[0][0] == 0:
+    print(shared.CLASS_NIKITA)
+else:
+    print(shared.CLASS_UNKNOW)

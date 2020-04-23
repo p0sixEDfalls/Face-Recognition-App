@@ -15,4 +15,5 @@ def predict(roi):
         return shared.CLASS_UNKNOW
     except:
         print("Prediction error occured.")
+        return None
     return shared.CLASS_UNKNOW
