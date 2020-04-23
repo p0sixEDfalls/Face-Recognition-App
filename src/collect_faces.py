@@ -2,6 +2,7 @@ import os
 import cv2
 import imutils
 import shared
+from PIL import ImageGrab
 
 FACE_CASCADE = cv2.CascadeClassifier(os.path.join("..", "data", "cascades", shared.DEFAULT))
 CAP = cv2.VideoCapture(0)
