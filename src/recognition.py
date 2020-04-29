@@ -2,42 +2,38 @@ import os
 import cv2
 import imutils
 import shared
+import dlib
+from PIL import ImageGrab
 import prediction
-from keras.models import load_model
 
-test_model = load_model(shared.MODEL_NAME)
-FACE_CASCADE = cv2.CascadeClassifier(os.path.join("..", "data", "cascades", shared.DEFAULT))
+detector = dlib.get_frontal_face_detector()
 CAP = cv2.VideoCapture(0)
-COUNT = len(next(os.walk(shared.ROOT_TRAIN_NIKITA_FOLDER))[2])
-
+CAP.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+CAP.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 ROI_COLOR = []
-COLOR = (255, 0, 0)
-STROKE = 2
 
 while(True):
     ret, frame = CAP.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = FACE_CASCADE.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+    rects = detector(gray, 1)
 
-    for (x, y, w, h) in faces:
-        ROI_COLOR = frame[y:y+h, x:x+w]
-        end_cord_x = x + w
-        end_cord_y = y + h
-        #CAREFUL! 
-        # If prediction.predict(ROI_COLOR) throw exception and return None
-        # We will put CLASS_UNKNOW text
-        class_name = prediction.predict(ROI_COLOR)
-        cv2.putText(frame, class_name or shared.CLASS_UNKNOW, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, COLOR, STROKE, cv2.LINE_AA)
-        cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), COLOR, STROKE)
+    try:
+        for (i, rect) in enumerate(rects):
+            (x, y, w, h) = shared.rect_to_bb(rect)
+            ROI_COLOR = frame[y:y+h, x:x+w]
+            end_cord_x = x + w
+            end_cord_y = y + h
+            c_name, color = prediction.predict(ROI_COLOR)
+            cv2.putText(frame, c_name, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, shared.STROKE, cv2.LINE_AA)
+            cv2.rectangle(frame, (x, y), (end_cord_x, end_cord_y), color, shared.STROKE)
+    except:
+        print('Error')  
 
     cv2.imshow('frame', frame)
 
     key = cv2.waitKey(1) & 0xFF
 
-    if key == ord('s'):
-        cv2.imwrite(os.path.join(shared.ROOT_TRAIN_NIKITA_FOLDER, str(COUNT) + ".png"), imutils.resize(ROI_COLOR, width=shared.IMG_WIDTH, height=shared.IMG_HEIGHT))
-        COUNT += 1
-    elif key == ord("q"):
+    if key == ord('q'):
         break
 
 CAP.release()

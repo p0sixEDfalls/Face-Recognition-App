@@ -10,10 +10,13 @@ def predict(roi):
         roi = cv2.resize(roi, (shared.IMG_WIDTH, shared.IMG_HEIGHT))
         roi = np.reshape(roi, [1, shared.IMG_WIDTH, shared.IMG_HEIGHT, 3])
         classes = model.predict_classes(roi)
+        preds = model.predict_proba(roi)
+        print(preds)
+        print(classes)
         if classes[0][0] == 0:
-            return shared.CLASS_NIKITA
-        return shared.CLASS_UNKNOW
+            return shared.CLASS_NIKITA, shared.COLOR_GREEN, preds[0][0]
+        return shared.CLASS_UNKNOW, shared.COLOR_RED, preds[0][0]
     except:
         print("Prediction error occured.")
         return None
-    return shared.CLASS_UNKNOW
+    return shared.CLASS_UNKNOW, shared.COLOR_RED, 1.
